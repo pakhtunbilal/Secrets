@@ -15,10 +15,16 @@ app.set('view engine', 'ejs')
 app.use(bodyparser.urlencoded({extended:true}))
 
 app.use(session({
-    secret:"this is our little seccret",
-    resave: false,
-    saveUninitialized: false
-}))
+  secret: 'menahibtaunga',
+  saveUninitialized: true,
+  resave: true,
+  // using store session on MongoDB using express-session + connect
+  store: new MongoStore({
+    url: process.env.MONGO_URI,
+    collection: 'sessions'
+  })
+}));
+
 
 app.use(passport.initialize())
 app.use(passport.session())
