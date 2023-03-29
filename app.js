@@ -34,14 +34,7 @@ app.use(session({
   saveUninitialized: true,
   resave: true,
   // using store session on MongoDB using express-session + connect
-<<<<<<< HEAD
   store: store
-=======
-  store: new MongoStore({
-    url: process.env.MONGO_URI,
-    collection: 'sessions'
-  })
->>>>>>> 7492cffb564e2a5bc5019df53cbcabed3b65ff5d
 }));
 
 
