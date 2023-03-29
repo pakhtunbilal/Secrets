@@ -8,17 +8,35 @@ const passport = require('passport')
 const passportLocalMongoose = require('passport-local-mongoose')
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require('mongoose-findorcreate')
+const MongoDBStore = require('connect-mongodb-session')(session);
 
 const app = express();
 app.use(express.static('public'))
 app.set('view engine', 'ejs')
 app.use(bodyparser.urlencoded({extended:true}))
 
+const store = new MongoDBStore(
+  {
+    uri: process.env.MONGO_URI,
+    databaseName: 'connect_mongodb_session_test',
+    collection: 'mySessions'
+  },
+  function(error) {
+    console.log(error)
+  });
+
+store.on('error', function(error) {
+  console.log(error)
+});
+
 app.use(session({
-    secret:"this is our little seccret",
-    resave: false,
-    saveUninitialized: false
-}))
+  secret: 'menahibtaunga',
+  saveUninitialized: true,
+  resave: true,
+  // using store session on MongoDB using express-session + connect
+  store: store
+}));
+
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -56,7 +74,7 @@ passport.deserializeUser(function(user, done) {
 passport.use(new GoogleStrategy({
   clientID: process.env.CLIENT_ID,
   clientSecret: process.env.CLIENT_SECRET,
-  callbackURL: "http://localhost:3000/auth/google/secrets",
+  callbackURL: "https://fair-erin-sea-lion-ring.cyclic.app/auth/google/secrets",
   userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
 },
 async function (accessToken, refreshToken, profile, done) {
